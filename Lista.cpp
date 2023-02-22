@@ -3,86 +3,94 @@
 //
 
 #include "Lista.h"
+#include "Oggetto.h"
 #include <iostream>
-#include <vector>
 #include <string>
-#include <fstream>
 using namespace std;
 
-Lista::Lista(){
+Lista::Lista(string n){
+
+    nomeL = n;
 
 };
 
+
 void Lista::mostra() {
 
-    cout << "====================================\n"
-         << "LISTA DELLA SPESA\n"
-         << "====================================\n";
-    int n = 1;
-    for(Oggetto& oggetto : oggetti){
-        cout << n << ") [" << (oggetto.acquistato ? "X" : " ") << "] "
-             << oggetto.nome << "\n";
-        n++;
+    float totP = 0;
+    float totPMark = 0;
+    float totPUnmark = 0;
+    string UnomeL = this->nomeL;
+    for(int i = 0; i < UnomeL.size(); i++){
+        UnomeL[i] = toupper(UnomeL[i]);
     }
 
-    cout << " ====================================\n";
+    cout << "====================================" << endl
+         << "            "<<UnomeL<<"            " << endl
+
+         << "====================================" << endl;
+    int n = 1;
+    for(oggetti.begin();n < oggetti.size(); n++){
+
+        totP += oggetti[n].getPrezzo();
+        if(oggetti[n].isAcquistato())
+            totPMark += oggetti[n].getPrezzo();
+        else
+            totPUnmark += oggetti[n].getPrezzo();
+
+        cout << n << ") [" << (oggetti[n].isAcquistato() ? "X" : " ") << "] "
+             << oggetti[n].getNome() << " C: "<< oggetti[n].getCategoria() << " Q: " << oggetti[n].getQuantita()<<" P: " << oggetti[n].getPrezzo() << endl;
+    }
+
+    cout << "Prezzo Totale Lista = " << totP << " Prezzo oggetti acquistati = " << totPMark << " Prezzo oggetti da acquistare = " << totPUnmark <<endl;
+    cout << "=====================================" << endl;
 }
 
-void Lista::addOggetto(string oggetto) {
-    Oggetto ogg;
-    ogg.nome = oggetto;
-    ogg.acquistato = false;
-    oggetti.push_back(ogg);
-    this->salva();
+string Lista::getNomeLista() const {
+
+    return this->nomeL;
+}
+
+
+void Lista::addOggetto(string o, string c, float p) {
+
+    int i = 1;
+    bool found = false;
+    for(oggetti.begin(); i < oggetti.size(); i++){
+        if(oggetti[i].getNome() == o) {
+            oggetti[i].setQuantita(oggetti[i].getQuantita() + 1);
+            found = true;
+            break;
+        }
+    }
+
+    if(found == false){
+        Oggetto ogg(o,c,p);
+        oggetti.push_back(ogg);
+    }
+
 }
 
 void Lista::removeOggetto(int i) {
+
     oggetti.erase(oggetti.begin() + (i - 1));
-    this->salva();
 }
 
+
+
+
 void Lista::markAcquistato(int i) {
-    oggetti[i - 1].acquistato = true;
-    this->salva();
+
+    oggetti[i - 1].setAcquistato(true);
+
 }
 
 void Lista::markNonAcquistato(int i) {
-    oggetti[i -1].acquistato = false;
-    this->salva();
+
+    oggetti[i - 1].setAcquistato(false);
+
 }
 
-void Lista::carica() {
-    ifstream iFile("Listadellaspesa.txt");
-    Oggetto ogg;
-    string temp;
-    if( iFile.is_open()){
-        while(iFile.good()){
-            getline(iFile,ogg.nome,',');
-            getline(iFile,temp,'\n');
-            ogg.acquistato = stoi(temp);
-            oggetti.push_back(ogg);
-        }
-        iFile.close();
-    }
-
-    else{
-        cout << "Non ci sono file da leggere.\n";
-    }
-}
+Lista::~Lista() = default;
 
 
-void Lista::salva() {
-    ofstream uFile("Lista_della_spesa.txt");
-    if(uFile.is_open()){
-        for(int i = 0; i < oggetti.size(); i++){
-            uFile << oggetti[i].nome << "," << (oggetti[i].acquistato ? "1" : "0");
-            if(i < oggetti.size() - 1){
-                uFile << "\n";
-            }
-        }
-        uFile.close();
-    }
-    else{
-        cout << "Errore nella scrittura su File." << endl;
-    }
-}

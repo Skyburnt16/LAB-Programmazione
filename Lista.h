@@ -7,36 +7,35 @@
 
 #include <string>
 #include <vector>
+#include "Oggetto.h"
 using namespace std;
-
-struct Oggetto{
-
-    string nome;
-    bool acquistato;
-
-};
 
 class Lista {
 
-    private:
-        vector<Oggetto> oggetti;
+private:
 
-    public:
-        Lista();
+    string nomeL;
+    vector<Oggetto> oggetti;
 
-        void mostra();
+public:
+    Lista(string n);
 
-        void addOggetto(string oggetto);
+    string getNomeLista() const;
 
-        void removeOggetto(int i);
+    void mostra();
 
-        void markAcquistato(int i);
+    void addOggetto(string oggetto,string categoria,float prezzo);
 
-        void markNonAcquistato(int i);
+    void removeOggetto(int i);
 
-        void carica();
+    void markAcquistato(int i);
 
-        void salva();
+    virtual ~Lista();
+
+    void markNonAcquistato(int i);
+
+
+
 
 };
 
